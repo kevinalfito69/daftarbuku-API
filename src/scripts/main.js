@@ -1,4 +1,5 @@
 function main() {
+  const baseUrl = "https://books-api.dicoding.dev";
   const getBook = () => {
     const xhr = new XMLHttpRequest();
     xhr.onload = function () {
@@ -13,20 +14,58 @@ function main() {
     xhr.onerror = function () {
       showResponseMessage();
     };
-    xhr.open("GET", "https://books-api.dicoding.dev/list");
+    xhr.open("GET", `${baseUrl}/list`);
     xhr.send();
   };
 
   const insertBook = (book) => {
     // tuliskan kode di sini!
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      const jsonResponse = JSON.parse(this.responseText);
+      showResponseMessage(jsonResponse.message);
+      getBook();
+    };
+    xhr.onerror = function () {
+      showResponseMessage();
+    };
+    xhr.open("POST", `${baseUrl}/add`);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("X-Auth-Token", "12345");
+    xhr.send(JSON.stringify(book));
   };
 
   const updateBook = (book) => {
     // tuliskan kode di sini!
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      const jsonResponse = JSON.parse(this.responseText);
+      showResponseMessage(jsonResponse.message);
+      getBook();
+    };
+    xhr.onerror = function () {
+      showResponseMessage();
+    };
+    xhr.open("PUT", `${baseUrl}/edit/${book.id}`);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("X-Auth-Token", "12345");
+    xhr.send(JSON.stringify(book));
   };
 
   const removeBook = (bookId) => {
     // tuliskan kode di sini!
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      const jsonResponse = JSON.parse(this.responseText);
+      showResponseMessage(jsonResponse.message);
+      getBook();
+    };
+    xhr.onerror = function () {
+      showResponseMessage();
+    };
+    xhr.open("DELETE", `${baseUrl}/delete/${bookId}`);
+    xhr.setRequestHeader("X-Auth-Token", "12345");
+    xhr.send();
   };
 
   /*
@@ -37,7 +76,7 @@ function main() {
     const listBookElement = document.querySelector("#listBook");
     listBookElement.innerHTML = "";
 
-    books.forEach((book) => {
+    books.reverse().forEach((book) => {
       listBookElement.innerHTML += `
         <div class="col-lg-4 col-md-6 col-sm-12" style="margin-top: 12px;">
           <div class="card">

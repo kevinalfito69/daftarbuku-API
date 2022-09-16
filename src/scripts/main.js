@@ -18,20 +18,24 @@ function main() {
     };
 
     const insertBook = (book) => {
-        // tuliskan kode di sini!
-        const xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            const jsonResponse = JSON.parse(this.responseText);
-            showResponseMessage(jsonResponse.message);
-            getBook();
-        };
-        xhr.onerror = function () {
-            showResponseMessage();
-        };
-        xhr.open("POST", `${baseUrl}/add`);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("X-Auth-Token", "12345");
-        xhr.send(JSON.stringify(book));
+        fetch(`${baseUrl}/add`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Auth-Token": "12345",
+            },
+            body: JSON.stringify(book),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((responseJSON) => {
+                showResponseMessage(responseJSON.message);
+                getBook();
+            })
+            .catch((error) => {
+                showResponseMessage(error);
+            });
     };
 
     const updateBook = (book) => {

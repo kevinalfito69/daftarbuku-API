@@ -1,83 +1,82 @@
 function main() {
-  const baseUrl = "https://books-api.dicoding.dev";
-  const getBook = () => {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      const jsonResponse = JSON.parse(this.responseText);
-      console.log(jsonResponse);
-      if (jsonResponse.error) {
-        showResponseMessage(jsonResponse.message);
-      } else {
-        renderAllBooks(jsonResponse.books);
-      }
+    const baseUrl = "https://books-api.dicoding.dev";
+    const getBook = () => {
+        fetch(`${baseUrl}/list`)
+            .then((response) => {
+                return response.json();
+            })
+            .then((responseJSON) => {
+                if (responseJSON.error) {
+                    showResponseMessage(responseJSON.message);
+                } else {
+                    renderAllBooks(responseJSON.books);
+                }
+            })
+            .catch((error) => {
+                showResponseMessage(error);
+            });
     };
-    xhr.onerror = function () {
-      showResponseMessage();
-    };
-    xhr.open("GET", `${baseUrl}/list`);
-    xhr.send();
-  };
 
-  const insertBook = (book) => {
-    // tuliskan kode di sini!
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      const jsonResponse = JSON.parse(this.responseText);
-      showResponseMessage(jsonResponse.message);
-      getBook();
+    const insertBook = (book) => {
+        // tuliskan kode di sini!
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            const jsonResponse = JSON.parse(this.responseText);
+            showResponseMessage(jsonResponse.message);
+            getBook();
+        };
+        xhr.onerror = function () {
+            showResponseMessage();
+        };
+        xhr.open("POST", `${baseUrl}/add`);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("X-Auth-Token", "12345");
+        xhr.send(JSON.stringify(book));
     };
-    xhr.onerror = function () {
-      showResponseMessage();
-    };
-    xhr.open("POST", `${baseUrl}/add`);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("X-Auth-Token", "12345");
-    xhr.send(JSON.stringify(book));
-  };
 
-  const updateBook = (book) => {
-    // tuliskan kode di sini!
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      const jsonResponse = JSON.parse(this.responseText);
-      showResponseMessage(jsonResponse.message);
-      getBook();
+    const updateBook = (book) => {
+        // tuliskan kode di sini!
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            const jsonResponse = JSON.parse(this.responseText);
+            showResponseMessage(jsonResponse.message);
+            getBook();
+        };
+        xhr.onerror = function () {
+            showResponseMessage();
+        };
+        xhr.open("PUT", `${baseUrl}/edit/${book.id}`);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("X-Auth-Token", "12345");
+        xhr.send(JSON.stringify(book));
     };
-    xhr.onerror = function () {
-      showResponseMessage();
-    };
-    xhr.open("PUT", `${baseUrl}/edit/${book.id}`);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("X-Auth-Token", "12345");
-    xhr.send(JSON.stringify(book));
-  };
 
-  const removeBook = (bookId) => {
-    // tuliskan kode di sini!
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      const jsonResponse = JSON.parse(this.responseText);
-      showResponseMessage(jsonResponse.message);
-      getBook();
+    const removeBook = (bookId) => {
+        // tuliskan kode di sini!
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            const jsonResponse = JSON.parse(this.responseText);
+            showResponseMessage(jsonResponse.message);
+            getBook();
+        };
+        xhr.onerror = function () {
+            showResponseMessage();
+        };
+        xhr.open("DELETE", `${baseUrl}/delete/${bookId}`);
+        xhr.setRequestHeader("X-Auth-Token", "12345");
+        xhr.send();
     };
-    xhr.onerror = function () {
-      showResponseMessage();
-    };
-    xhr.open("DELETE", `${baseUrl}/delete/${bookId}`);
-    xhr.setRequestHeader("X-Auth-Token", "12345");
-    xhr.send();
-  };
 
-  /*
+    /*
       jangan ubah kode di bawah ini ya!
   */
 
-  const renderAllBooks = (books) => {
-    const listBookElement = document.querySelector("#listBook");
-    listBookElement.innerHTML = "";
+    const renderAllBooks = (books) => {
+        const listBookElement = document.querySelector("#listBook");
+        listBookElement.innerHTML = "";
 
-    books.reverse().forEach((book) => {
-      listBookElement.innerHTML += `
+        books.reverse().forEach((book) => {
+            listBookElement.innerHTML += `
         <div class="col-lg-4 col-md-6 col-sm-12" style="margin-top: 12px;">
           <div class="card">
             <div class="card-body">
@@ -88,50 +87,52 @@ function main() {
           </div>
         </div>
       `;
+        });
+
+        const buttons = document.querySelectorAll(".button-delete");
+        buttons.forEach((button) => {
+            button.addEventListener("click", (event) => {
+                const bookId = event.target.id;
+
+                removeBook(bookId);
+            });
+        });
+    };
+
+    const showResponseMessage = (
+        message = "Check your internet connection"
+    ) => {
+        alert(message);
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const inputBookId = document.querySelector("#inputBookId");
+        const inputBookTitle = document.querySelector("#inputBookTitle");
+        const inputBookAuthor = document.querySelector("#inputBookAuthor");
+        const buttonSave = document.querySelector("#buttonSave");
+        const buttonUpdate = document.querySelector("#buttonUpdate");
+
+        buttonSave.addEventListener("click", function () {
+            const book = {
+                id: Number.parseInt(inputBookId.value),
+                title: inputBookTitle.value,
+                author: inputBookAuthor.value,
+            };
+
+            insertBook(book);
+        });
+
+        buttonUpdate.addEventListener("click", function () {
+            const book = {
+                id: Number.parseInt(inputBookId.value),
+                title: inputBookTitle.value,
+                author: inputBookAuthor.value,
+            };
+
+            updateBook(book);
+        });
+        getBook();
     });
-
-    const buttons = document.querySelectorAll(".button-delete");
-    buttons.forEach((button) => {
-      button.addEventListener("click", (event) => {
-        const bookId = event.target.id;
-
-        removeBook(bookId);
-      });
-    });
-  };
-
-  const showResponseMessage = (message = "Check your internet connection") => {
-    alert(message);
-  };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const inputBookId = document.querySelector("#inputBookId");
-    const inputBookTitle = document.querySelector("#inputBookTitle");
-    const inputBookAuthor = document.querySelector("#inputBookAuthor");
-    const buttonSave = document.querySelector("#buttonSave");
-    const buttonUpdate = document.querySelector("#buttonUpdate");
-
-    buttonSave.addEventListener("click", function () {
-      const book = {
-        id: Number.parseInt(inputBookId.value),
-        title: inputBookTitle.value,
-        author: inputBookAuthor.value,
-      };
-
-      insertBook(book);
-    });
-
-    buttonUpdate.addEventListener("click", function () {
-      const book = {
-        id: Number.parseInt(inputBookId.value),
-        title: inputBookTitle.value,
-        author: inputBookAuthor.value,
-      };
-
-      updateBook(book);
-    });
-    getBook();
-  });
 }
 
 export default main;
